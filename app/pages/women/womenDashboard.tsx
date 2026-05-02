@@ -1,12 +1,12 @@
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import Navbar from "../../../component/Navbar";
@@ -19,18 +19,18 @@ type Product = {
   rental_fee: number;
 };
 
-const MenDashboard = () => {
-  const [tux, setTux] = useState<Product[]>([]);
+const WomenDashboard = () => {
+  const [wedding, setWedding] = useState<Product[]>([]);
   const [prom, setProm] = useState<Product[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const res = await API.get("/men");
-        setTux(res.data.tux || []);
+        const res = await API.get("/women");
+        setWedding(res.data.wedding || []);
         setProm(res.data.prom || []);
       } catch (err) {
-        console.log("Failed to load men dashboard:", err);
+        console.log("Failed to load women dashboard:", err);
       }
     };
 
@@ -75,46 +75,47 @@ const MenDashboard = () => {
       {/* NAVBAR */}
       <Navbar onMenuPress={() => console.log("Open sidebar")} />
 
-      {/* ✅ INSERTED MEN / WOMEN TABS */}
+      {/* MEN / WOMEN TABS */}
       <View style={styles.tabs}>
         <TouchableOpacity
-          style={[styles.tab, styles.activeTab]}
+          style={styles.tab}
           onPress={() => router.push("/pages/men/menDashboard" as any)}
         >
           <Text>MEN</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.tab}
-          onPress={() => router.push("/pages/women/womenDashboard" as any)}
-        >
+        {/* ✅ FIXED: removed onPress */}
+        <TouchableOpacity style={[styles.tab, styles.activeTab]}>
           <Text>WOMEN</Text>
         </TouchableOpacity>
       </View>
 
+      {/* BANNER */}
       <Image
-        source={{ uri: `${BASE_URL}/images/banner-men.png` }}
+        source={{ uri: `${BASE_URL}/images/banner-women.png` }}
         style={styles.banner}
       />
 
+      {/* WEDDING GOWNS */}
       <View style={styles.section}>
         <View style={styles.header}>
-          <Text style={styles.title}>TUXEDO & SUITS</Text>
+          <Text style={styles.title}>WEDDING GOWNS</Text>
           <TouchableOpacity
-            onPress={() => router.push("/pages/men/menTuxedo" as any)}
+            onPress={() => router.push("/pages/women/womenWedding" as any)}
           >
             <Text style={styles.viewMore}>view more</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.row}>{tux.slice(0, 6).map(renderProduct)}</View>
+        <View style={styles.row}>{wedding.slice(0, 6).map(renderProduct)}</View>
       </View>
 
+      {/* PROM & STYLES */}
       <View style={[styles.section, { marginBottom: 30 }]}>
         <View style={styles.header}>
           <Text style={styles.title}>PROM & STYLES</Text>
           <TouchableOpacity
-            onPress={() => router.push("/pages/men/menProm" as any)}
+            onPress={() => router.push("/pages/women/womenProm" as any)}
           >
             <Text style={styles.viewMore}>view more</Text>
           </TouchableOpacity>
@@ -126,7 +127,7 @@ const MenDashboard = () => {
   );
 };
 
-export default MenDashboard;
+export default WomenDashboard;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
   name: { marginTop: 5, fontSize: 12, color: "#444" },
   price: { marginTop: 2, fontWeight: "bold" },
 
-  /* ✅ NEW STYLES FOR TABS */
+  /* TABS */
   tabs: {
     flexDirection: "row",
     alignSelf: "center",

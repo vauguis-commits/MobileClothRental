@@ -1,19 +1,18 @@
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
-  Image,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Image,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-import Navbar from "../../../component/Navbar"; // ✅ ADDED
+import Navbar from "../../../component/Navbar";
 import API, { BASE_URL } from "../../../services/api";
 
 type Product = {
@@ -32,7 +31,7 @@ const PRICE_FILTERS: { label: string; value: PriceFilter }[] = [
   { label: "₱451+", value: "high" },
 ];
 
-export default function MenProm() {
+export default function WomenProm() {
   const [prom, setProm] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -43,7 +42,8 @@ export default function MenProm() {
   const loadData = async () => {
     setError("");
     try {
-      const res = await API.get("/men/prom");
+      // ✅ CHANGED: women endpoint
+      const res = await API.get("/women/prom");
       setProm(Array.isArray(res.data) ? res.data : res.data.prom || []);
     } catch {
       setError("Failed to load items. Pull down to try again.");
@@ -62,6 +62,7 @@ export default function MenProm() {
     loadData();
   };
 
+  // ✅ SAME FILTER LOGIC
   const filteredProducts = useMemo(() => {
     return prom.filter((product) => {
       const matchesSearch = product.item_name
@@ -95,7 +96,6 @@ export default function MenProm() {
   if (loading) {
     return (
       <SafeAreaView style={styles.centered}>
-        <Navbar onMenuPress={() => console.log("Open sidebar")} />
         <ActivityIndicator size="large" color="#3b2314" />
         <Text style={styles.loadingText}>Loading...</Text>
       </SafeAreaView>
@@ -106,7 +106,6 @@ export default function MenProm() {
   if (error) {
     return (
       <SafeAreaView style={styles.centered}>
-        <Navbar onMenuPress={() => console.log("Open sidebar")} />
         <Text style={styles.errorText}>⚠ {error}</Text>
         <TouchableOpacity style={styles.retryButton} onPress={loadData}>
           <Text style={styles.retryText}>Retry</Text>
@@ -118,11 +117,10 @@ export default function MenProm() {
   // ── Main ──
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      {/* ✅ NAVBAR ADDED HERE */}
       <Navbar onMenuPress={() => console.log("Open sidebar")} />
-
       <Text style={styles.title}>PROM & STYLES</Text>
 
+      {/* Search */}
       <View style={styles.searchRow}>
         <TextInput
           style={styles.searchInput}
@@ -134,6 +132,7 @@ export default function MenProm() {
         />
       </View>
 
+      {/* Filters */}
       <View style={styles.filterRow}>
         {PRICE_FILTERS.map((f) => (
           <TouchableOpacity
@@ -156,6 +155,7 @@ export default function MenProm() {
         ))}
       </View>
 
+      {/* Count */}
       <Text style={styles.resultCount}>
         {filteredProducts.length} item
         {filteredProducts.length !== 1 ? "s" : ""} found
@@ -217,6 +217,7 @@ export default function MenProm() {
   );
 }
 
+// ✅ styles unchanged
 const styles = StyleSheet.create({
   title: {
     marginTop: 10,
@@ -224,7 +225,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontWeight: "bold",
   },
-  // Search
   searchRow: {
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -239,8 +239,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#eee",
   },
-
-  // Price filters
   filterRow: {
     flexDirection: "row",
     paddingHorizontal: 10,
@@ -259,16 +257,12 @@ const styles = StyleSheet.create({
   filterBtnActive: { backgroundColor: "#3b2314", borderColor: "#3b2314" },
   filterText: { fontSize: 12, color: "#555" },
   filterTextActive: { color: "#fff", fontWeight: "500" },
-
-  // Result count
   resultCount: {
     paddingHorizontal: 14,
     paddingBottom: 6,
     fontSize: 12,
     color: "#888",
   },
-
-  // Products
   scrollContent: { paddingBottom: 30 },
   row: { flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 6 },
   product: {
@@ -289,8 +283,6 @@ const styles = StyleSheet.create({
     color: "#3b2314",
     fontSize: 13,
   },
-
-  // States
   centered: {
     flex: 1,
     justifyContent: "center",

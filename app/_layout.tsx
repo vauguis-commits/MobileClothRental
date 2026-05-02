@@ -41,6 +41,18 @@ export default function RootLayout() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="pages/women/womenDashboard"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="pages/women/womenProm"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="pages/women/womenWedding"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name="pages/product/productDetails"
           options={{ headerShown: false }}
         />

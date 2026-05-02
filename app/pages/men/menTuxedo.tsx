@@ -1,17 +1,18 @@
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-    ActivityIndicator,
-    Image,
-    RefreshControl,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Image,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Navbar from "../../../component/Navbar";
 import API, { BASE_URL } from "../../../services/api";
 
 type Product = {
@@ -116,6 +117,7 @@ export default function MenTuxedo() {
   // ── Main ─────────────────────────────────────────────────────
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+      <Navbar onMenuPress={() => console.log("Open sidebar")} />
       <Text style={styles.title}>TUXEDO & SUITS</Text>
       {/* Search bar */}
       <View style={styles.searchRow}>
@@ -216,6 +218,7 @@ export default function MenTuxedo() {
 
 const styles = StyleSheet.create({
   title: {
+    marginTop: 10,
     fontSize: 18,
     alignSelf: "center",
     fontWeight: "bold",
