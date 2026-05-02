@@ -17,7 +17,7 @@ const Navbar = ({ onMenuPress }: Props) => {
 
         {/* TITLE */}
         <View style={{ alignItems: "center", flex: 1 }}>
-          <Text style={styles.title}>SOLEIL LALUNA</Text>
+          <Text style={styles.title}>SOLEIL LALUNAs</Text>
           <Text style={styles.subtitle}>BOUTIQUE</Text>
         </View>
 
