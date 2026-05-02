@@ -1,15 +1,15 @@
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-    ActivityIndicator,
-    Image,
-    RefreshControl,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Image,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Navbar from "../../../component/Navbar";
@@ -117,7 +117,7 @@ export default function WomenProm() {
   // ── Main ──
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <Navbar onMenuPress={() => console.log("Open sidebar")} />
+      <Navbar showBack />
       <Text style={styles.title}>PROM & STYLES</Text>
 
       {/* Search */}
@@ -174,7 +174,7 @@ export default function WomenProm() {
       >
         {filteredProducts.length === 0 ? (
           <View style={styles.centered}>
-            <Text style={styles.empty}>No items match your search</Text>
+            <Text style={styles.empty}>No items match your search.</Text>
             <TouchableOpacity
               onPress={() => {
                 setSearch("");

@@ -1,15 +1,15 @@
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-    ActivityIndicator,
-    Image,
-    RefreshControl,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Image,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Navbar from "../../../component/Navbar";
@@ -116,9 +116,9 @@ export default function WomenWedding() {
   // MAIN
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <Navbar onMenuPress={() => console.log("Open sidebar")} />
+      <Navbar showBack />
 
-      <Text style={styles.title}>WEDDING GOWNSa</Text>
+      <Text style={styles.title}>WEDDING GOWNS</Text>
 
       {/* SEARCH */}
       <View style={styles.searchRow}>

@@ -56,10 +56,6 @@ export default function RootLayout() {
           name="pages/product/productDetails"
           options={{ headerShown: false }}
         />
-        <Stack.Screen
-          name="pages/product/checkout"
-          options={{ headerShown: false }}
-        />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

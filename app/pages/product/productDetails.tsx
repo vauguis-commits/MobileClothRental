@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Navbar from "../../../component/Navbar";
 import API, { BASE_URL } from "../../../services/api";
 
 type Size = {
@@ -30,6 +31,7 @@ type Product = {
 };
 
 export default function ProductDetails() {
+  // ── ALL hooks first ──────────────────────────────────────────
   const { id } = useLocalSearchParams();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -47,11 +49,10 @@ export default function ProductDetails() {
         setLoading(false);
       }
     };
-
     if (id) loadProduct();
   }, [id]);
 
-  // ── Parse sizes (same logic as Vue computed) ─────────────────
+  // ── Helper functions ─────────────────────────────────────────
   const getSizes = (): Size[] => {
     if (!product?.sizes) return [];
     try {
@@ -89,129 +90,124 @@ export default function ProductDetails() {
   const isOutOfStock = Number(product?.quantity) <= 0;
   const sizes = getSizes();
 
-  // ── Loading ──────────────────────────────────────────────────
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.centered}>
-        <ActivityIndicator size="large" color="#3b2314" />
-        <Text style={styles.loadingText}>Loading product...</Text>
-      </SafeAreaView>
-    );
-  }
-
-  // ── Error ────────────────────────────────────────────────────
-  if (error || !product) {
-    return (
-      <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorText}>⚠ {error || "Product not found."}</Text>
-        <TouchableOpacity style={styles.retryBtn} onPress={() => router.back()}>
-          <Text style={styles.retryText}>Go Back</Text>
-        </TouchableOpacity>
-      </SafeAreaView>
-    );
-  }
-
-  // ── Main ─────────────────────────────────────────────────────
+  // ── Single return ────────────────────────────────────────────
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Product Image */}
-        <Image
-          source={{ uri: productImage(product.image) }}
-          style={styles.image}
-          resizeMode="cover"
-        />
-
-        <View style={styles.infoContainer}>
-          {/* Out of stock banner */}
-          {isOutOfStock && (
-            <View style={styles.outOfStockBanner}>
-              <Text style={styles.outOfStockTitle}>Out of Stock</Text>
-              <Text style={styles.outOfStockMsg}>
-                This item is currently unavailable for reservation.
-              </Text>
-            </View>
-          )}
-
-          {/* Name & Price */}
-          <Text style={styles.productName}>{product.item_name}</Text>
-          <Text style={styles.rentPrice}>
-            Rent for ₱{formatPrice(product.rental_fee)}
+    <SafeAreaView style={{ flex: 0, backgroundColor: "#fff" }}>
+      <Navbar showBack />
+      {loading ? (
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color="#3b2314" />
+          <Text style={styles.loadingText}>Loading product...</Text>
+        </View>
+      ) : error || !product ? (
+        <View style={styles.centered}>
+          <Text style={styles.errorText}>
+            ⚠ {error || "Product not found."}
           </Text>
-
-          {/* Divider */}
-          <View style={styles.divider} />
-
-          {/* Size Table */}
-          {sizes.length > 0 && (
-            <View style={styles.sizeSection}>
-              <Text style={styles.sizeTitle}>AVAILABLE SIZES (inches)</Text>
-
-              {/* Table Header */}
-              <View style={[styles.tableRow, styles.tableHeader]}>
-                {["Size", "Chest", "Waist", "Hip", "Stock"].map((h) => (
-                  <Text
-                    key={h}
-                    style={[styles.tableCell, styles.tableHeaderText]}
-                  >
-                    {h}
-                  </Text>
-                ))}
-              </View>
-
-              {/* Table Rows */}
-              {sizes.map((size, index) => (
-                <View
-                  key={index}
-                  style={[
-                    styles.tableRow,
-                    index % 2 === 0 && styles.tableRowAlt,
-                  ]}
-                >
-                  <Text style={styles.tableCell}>{capitalize(size.size)}</Text>
-                  <Text style={styles.tableCell}>{size.chest}</Text>
-                  <Text style={styles.tableCell}>{size.waist}</Text>
-                  <Text style={styles.tableCell}>{size.hip}</Text>
-                  <Text
-                    style={[
-                      styles.tableCell,
-                      Number(size.available) > 0
-                        ? styles.availableText
-                        : styles.unavailableText,
-                    ]}
-                  >
-                    {Number(size.available) > 0
-                      ? `${size.available} left`
-                      : "None"}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          )}
-
-          {/* Divider */}
-          <View style={styles.divider} />
-
-          {/* Rent Now Button */}
           <TouchableOpacity
-            style={[styles.rentBtn, isOutOfStock && styles.rentBtnDisabled]}
-            disabled={isOutOfStock}
-            onPress={() =>
-              router.push(`/pages/product/checkout?id=${product.id}` as any)
-            }
+            style={styles.retryBtn}
+            onPress={() => router.back()}
           >
-            <Text style={styles.rentBtnText}>
-              {isOutOfStock ? "OUT OF STOCK" : "RENT NOW"}
-            </Text>
+            <Text style={styles.retryText}>Go Back</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      ) : (
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* Product Image */}
+          <Image
+            source={{ uri: productImage(product.image) }}
+            style={styles.image}
+            resizeMode="cover"
+          />
+
+          <View style={styles.infoContainer}>
+            {/* Out of stock banner */}
+            {isOutOfStock && (
+              <View style={styles.outOfStockBanner}>
+                <Text style={styles.outOfStockTitle}>Out of Stock</Text>
+                <Text style={styles.outOfStockMsg}>
+                  This item is currently unavailable for reservation.
+                </Text>
+              </View>
+            )}
+
+            {/* Name & Price */}
+            <Text style={styles.productName}>{product.item_name}</Text>
+            <Text style={styles.rentPrice}>
+              Rent for ₱{formatPrice(product.rental_fee)}
+            </Text>
+
+            <View style={styles.divider} />
+
+            {/* Size Table */}
+            {sizes.length > 0 && (
+              <View style={styles.sizeSection}>
+                <Text style={styles.sizeTitle}>AVAILABLE SIZES (inches)</Text>
+
+                <View style={[styles.tableRow, styles.tableHeader]}>
+                  {["Size", "Chest", "Waist", "Hip", "Stock"].map((h) => (
+                    <Text
+                      key={h}
+                      style={[styles.tableCell, styles.tableHeaderText]}
+                    >
+                      {h}
+                    </Text>
+                  ))}
+                </View>
+
+                {sizes.map((size, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.tableRow,
+                      index % 2 === 0 && styles.tableRowAlt,
+                    ]}
+                  >
+                    <Text style={styles.tableCell}>
+                      {capitalize(size.size)}
+                    </Text>
+                    <Text style={styles.tableCell}>{size.chest}</Text>
+                    <Text style={styles.tableCell}>{size.waist}</Text>
+                    <Text style={styles.tableCell}>{size.hip}</Text>
+                    <Text
+                      style={[
+                        styles.tableCell,
+                        Number(size.available) > 0
+                          ? styles.availableText
+                          : styles.unavailableText,
+                      ]}
+                    >
+                      {Number(size.available) > 0
+                        ? `${size.available} left`
+                        : "None"}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            <View style={styles.divider} />
+
+            {/* Rent Now Button */}
+            <TouchableOpacity
+              style={[styles.rentBtn, isOutOfStock && styles.rentBtnDisabled]}
+              disabled={isOutOfStock}
+              onPress={() =>
+                router.push(`/pages/product/checkout?id=${product.id}` as any)
+              }
+            >
+              <Text style={styles.rentBtnText}>
+                {isOutOfStock ? "OUT OF STOCK" : "RENT NOW"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  // Layout
   scrollContent: { paddingBottom: 40 },
   centered: {
     flex: 1,
@@ -221,11 +217,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   infoContainer: { padding: 20 },
-
-  // Image
   image: { width: "100%", height: 300, backgroundColor: "#f0f0f0" },
-
-  // Out of stock
   outOfStockBanner: {
     backgroundColor: "#f8d7da",
     borderRadius: 8,
@@ -239,8 +231,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   outOfStockMsg: { color: "#721c24", fontSize: 13 },
-
-  // Name & price
   productName: {
     fontSize: 22,
     fontWeight: "bold",
@@ -253,11 +243,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 4,
   },
-
-  // Divider
   divider: { height: 1, backgroundColor: "#eee", marginVertical: 16 },
-
-  // Size table
   sizeSection: { marginBottom: 8 },
   sizeTitle: {
     fontSize: 13,
@@ -273,8 +259,6 @@ const styles = StyleSheet.create({
   tableHeaderText: { color: "#fff", fontWeight: "bold", fontSize: 12 },
   availableText: { color: "#2d6a4f", fontWeight: "600" },
   unavailableText: { color: "#dc3545", fontWeight: "bold" },
-
-  // Rent button
   rentBtn: {
     backgroundColor: "#3b2314",
     padding: 16,
@@ -289,8 +273,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: 1,
   },
-
-  // States
   loadingText: { marginTop: 12, color: "#888", fontSize: 14 },
   errorText: {
     color: "#e53e3e",
