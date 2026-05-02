@@ -86,7 +86,7 @@ const WomenDashboard = () => {
 
         {/* ✅ FIXED: removed onPress */}
         <TouchableOpacity style={[styles.tab, styles.activeTab]}>
-          <Text>WOMEN</Text>
+          <Text>WOMENs</Text>
         </TouchableOpacity>
       </View>
 

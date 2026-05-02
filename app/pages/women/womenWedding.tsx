@@ -118,7 +118,7 @@ export default function WomenWedding() {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <Navbar onMenuPress={() => console.log("Open sidebar")} />
 
-      <Text style={styles.title}>WEDDING GOWNS</Text>
+      <Text style={styles.title}>WEDDING GOWNSa</Text>
 
       {/* SEARCH */}
       <View style={styles.searchRow}>

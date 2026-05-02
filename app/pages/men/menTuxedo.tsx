@@ -118,7 +118,7 @@ export default function MenTuxedo() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <Navbar onMenuPress={() => console.log("Open sidebar")} />
-      <Text style={styles.title}>TUXEDO & SUITS</Text>
+      <Text style={styles.title}>TUXEDOs & SUITS</Text>
       {/* Search bar */}
       <View style={styles.searchRow}>
         <TextInput

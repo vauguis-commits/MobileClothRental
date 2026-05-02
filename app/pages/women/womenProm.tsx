@@ -174,7 +174,7 @@ export default function WomenProm() {
       >
         {filteredProducts.length === 0 ? (
           <View style={styles.centered}>
-            <Text style={styles.empty}>No items match your search.</Text>
+            <Text style={styles.empty}>No items match your search</Text>
             <TouchableOpacity
               onPress={() => {
                 setSearch("");

@@ -121,7 +121,7 @@ export default function MenProm() {
       {/* ✅ NAVBAR ADDED HERE */}
       <Navbar onMenuPress={() => console.log("Open sidebar")} />
 
-      <Text style={styles.title}>PROM & STYLES</Text>
+      <Text style={styles.title}>PROM & STYLESs</Text>
 
       <View style={styles.searchRow}>
         <TextInput
