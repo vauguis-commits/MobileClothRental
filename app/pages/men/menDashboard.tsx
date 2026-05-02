@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Image,
@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import API, { BASE_URL } from "../../../services/api";
 
 type Product = {
   id: number;
@@ -17,25 +18,15 @@ type Product = {
 };
 
 const MenDashboard = () => {
-  const navigation = useNavigation<any>();
-
   const [tux, setTux] = useState<Product[]>([]);
   const [prom, setProm] = useState<Product[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const res = await fetch("http://192.168.137.1:8000/api/men", {
-          headers: {
-            Accept: "application/json",
-            "X-Requested-With": "XMLHttpRequest",
-          },
-        });
-
-        const data = await res.json();
-
-        setTux(data.tux || []);
-        setProm(data.prom || []);
+        const res = await API.get("/men");
+        setTux(res.data.tux || []);
+        setProm(res.data.prom || []);
       } catch (err) {
         console.log("Failed to load men dashboard:", err);
       }
@@ -53,54 +44,59 @@ const MenDashboard = () => {
 
   const productImage = (image: string) => {
     return image
-      ? `http://192.168.137.1:8000/storage/${image}`
-      : "http://192.168.137.1:8000/images/hfhmn.jpg";
+      ? `${BASE_URL}/storage/${image}`
+      : `${BASE_URL}/images/hfhmn.jpg`;
   };
 
   const renderProduct = (product: Product) => (
     <TouchableOpacity
       key={product.id}
       style={styles.product}
-      onPress={() => navigation.navigate("ProductDetails", { id: product.id })}
+      onPress={() =>
+        router.push(`/pages/product/productDetails?id=${product.id}` as any)
+      }
     >
       <Image
         source={{ uri: productImage(product.image) }}
         style={styles.image}
+        resizeMode="cover"
       />
+      <Text style={styles.name} numberOfLines={1}>
+        {product.item_name}
+      </Text>
       <Text style={styles.price}>₱{formatPrice(product.rental_fee)}</Text>
     </TouchableOpacity>
   );
 
   return (
     <ScrollView style={styles.container}>
-      {/* Banner */}
       <Image
-        source={{ uri: "http://192.168.137.1:8000/images/banner-men.png" }}
+        source={{ uri: `${BASE_URL}/images/banner-men.png` }}
         style={styles.banner}
       />
 
-      {/* TUXEDO */}
       <View style={styles.section}>
         <View style={styles.header}>
           <Text style={styles.title}>TUXEDO & SUITS</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("MenTuxedo")}>
+          <TouchableOpacity
+            onPress={() => router.push("/pages/men/menTuxedo" as any)}
+          >
             <Text style={styles.viewMore}>view more</Text>
           </TouchableOpacity>
         </View>
-
-        <View style={styles.row}>{tux.slice(0, 5).map(renderProduct)}</View>
+        <View style={styles.row}>{tux.slice(0, 6).map(renderProduct)}</View>
       </View>
 
-      {/* PROM */}
-      <View style={styles.section}>
+      <View style={[styles.section, { marginBottom: 30 }]}>
         <View style={styles.header}>
           <Text style={styles.title}>PROM & STYLES</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("MenProm")}>
+          <TouchableOpacity
+            onPress={() => router.push("/pages/men/menProm" as any)}
+          >
             <Text style={styles.viewMore}>view more</Text>
           </TouchableOpacity>
         </View>
-
-        <View style={styles.row}>{prom.slice(0, 5).map(renderProduct)}</View>
+        <View style={styles.row}>{prom.slice(0, 6).map(renderProduct)}</View>
       </View>
     </ScrollView>
   );
@@ -109,35 +105,17 @@ const MenDashboard = () => {
 export default MenDashboard;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  banner: {
-    width: "100%",
-    height: 180,
-    resizeMode: "cover",
-  },
-  section: {
-    marginTop: 20,
-    paddingHorizontal: 10,
-  },
+  container: { flex: 1, backgroundColor: "#fff" },
+  banner: { width: "100%", height: 180, resizeMode: "cover" },
+  section: { marginTop: 20, paddingHorizontal: 10 },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 10,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  viewMore: {
-    color: "blue",
-  },
-  row: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
+  title: { fontSize: 18, fontWeight: "bold" },
+  viewMore: { color: "blue" },
+  row: { flexDirection: "row", flexWrap: "wrap" },
   product: {
     width: "45%",
     margin: 5,
@@ -145,13 +123,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     borderRadius: 10,
   },
-  image: {
-    width: "100%",
-    height: 120,
-    borderRadius: 8,
-  },
-  price: {
-    marginTop: 5,
-    fontWeight: "bold",
-  },
+  image: { width: "100%", height: 120, borderRadius: 8 },
+  name: { marginTop: 5, fontSize: 12, color: "#444" },
+  price: { marginTop: 2, fontWeight: "bold" },
 });
