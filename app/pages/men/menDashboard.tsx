@@ -81,7 +81,7 @@ const MenDashboard = () => {
           style={[styles.tab, styles.activeTab]}
           onPress={() => router.push("/pages/men/menDashboard" as any)}
         >
-          <Text>MEN</Text>
+          <Text>MENs</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
