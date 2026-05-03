@@ -71,7 +71,7 @@ const About = () => {
             Our goal is to offer clients a convenient and affordable way to look
             their best without compromising on style or sophistication. Each
             garment is carefully maintained and tailored to ensure a perfect fit
-            and a polished appearance.
+            and a polished appearance
           </Text>
 
           <Text style={styles.text}>

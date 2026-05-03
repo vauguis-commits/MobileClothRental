@@ -120,6 +120,7 @@ export default function WomenProm() {
 
   // ── Main ──
   return (
+<<<<<<< HEAD
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       {/* ✅ SIDEBAR ADDED */}
       <Sidebar
@@ -128,6 +129,10 @@ export default function WomenProm() {
       />
       {/* NAVBAR */}
       <Navbar onMenuPress={() => setSidebarVisible(true)} />
+=======
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+      <Navbar showBack />
+>>>>>>> a8dc11a751f382b6c0c06c6ac9663dc02fa4395c
       <Text style={styles.title}>PROM & STYLES</Text>
       {/* Search */}
       <View style={styles.searchRow}>
