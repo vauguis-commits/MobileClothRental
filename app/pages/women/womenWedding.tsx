@@ -118,7 +118,6 @@ export default function WomenWedding() {
 
   // MAIN
   return (
-<<<<<<< HEAD
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       {/* ✅ SIDEBAR ADDED */}
       <Sidebar
@@ -128,12 +127,6 @@ export default function WomenWedding() {
       {/* NAVBAR */}
       <Navbar onMenuPress={() => setSidebarVisible(true)} />
       <Text style={styles.title}>PROM & STYLES</Text>
-=======
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <Navbar showBack />
-
-      <Text style={styles.title}>WEDDING GOWNS</Text>
->>>>>>> a8dc11a751f382b6c0c06c6ac9663dc02fa4395c
 
       {/* SEARCH */}
       <View style={styles.searchRow}>
