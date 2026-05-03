@@ -34,7 +34,7 @@ const Sidebar = ({ visible, onClose }: Props) => {
         {Item("About", "/pages/About")}
         {Item("How to", "/pages/howto")}
         {Item("FAQ", "/pages/Faq")}
-        {Item("Profile", "/pages/Profile")}
+        {Item("Profile", "/pages/profile")}
         {Item("Rented Items", "/pages/RentedItems")}
         {Item("Notifications", "/pages/Notifications")}
       </View>

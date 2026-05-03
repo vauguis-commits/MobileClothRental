@@ -15,7 +15,7 @@ const Faq = () => {
   const faqs = [
     {
       q: "How does clothing rental work?",
-      a: "You browse our collection, choose your desired outfit, select your size and rental period, and we deliver it to your doorstep. After you're done, just send it back using the prepaid return label — we handle the cleaning",
+      a: "You browse our collection, choose your desired outfit, select your size and rental period, and we deliver it to your doorstep. After you're done, just send it back using the prepaid return label — we handle the cleaning!",
     },
     {
       q: "What if the outfit doesn’t fit me?",
