@@ -10,6 +10,7 @@ import {
 } from "react-native";
 
 import Navbar from "../../../component/Navbar";
+import Sidebar from "../../../component/Sidebar";
 import API, { BASE_URL } from "../../../services/api";
 
 type Product = {
@@ -22,6 +23,8 @@ type Product = {
 const MenDashboard = () => {
   const [tux, setTux] = useState<Product[]>([]);
   const [prom, setProm] = useState<Product[]>([]);
+
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -71,58 +74,66 @@ const MenDashboard = () => {
   );
 
   return (
-    <ScrollView style={styles.container}>
-      {/* NAVBAR */}
-      <Navbar onMenuPress={() => console.log("Open sidebar")} />
-
-      {/* ✅ INSERTED MEN / WOMEN TABS */}
-      <View style={styles.tabs}>
-        <TouchableOpacity
-          style={[styles.tab, styles.activeTab]}
-          onPress={() => router.push("/pages/men/menDashboard" as any)}
-        >
-          <Text>MENs</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.tab}
-          onPress={() => router.push("/pages/women/womenDashboard" as any)}
-        >
-          <Text>WOMEN</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Image
-        source={{ uri: `${BASE_URL}/images/banner-men.png` }}
-        style={styles.banner}
+    <View style={{ flex: 1 }}>
+      {/* ✅ SIDEBAR */}
+      <Sidebar
+        visible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
       />
 
-      <View style={styles.section}>
-        <View style={styles.header}>
-          <Text style={styles.title}>TUXEDO & SUITS</Text>
+      <ScrollView style={styles.container}>
+        {/* NAVBAR */}
+        <Navbar onMenuPress={() => setSidebarVisible(true)} />
+
+        {/* MEN / WOMEN TABS */}
+        <View style={styles.tabs}>
           <TouchableOpacity
-            onPress={() => router.push("/pages/men/menTuxedo" as any)}
+            style={[styles.tab, styles.activeTab]}
+            onPress={() => router.push("/pages/men/menDashboard" as any)}
           >
-            <Text style={styles.viewMore}>view more</Text>
+            <Text>MEN</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.tab}
+            onPress={() => router.push("/pages/women/womenDashboard" as any)}
+          >
+            <Text>WOMEN</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.row}>{tux.slice(0, 6).map(renderProduct)}</View>
-      </View>
+        <Image
+          source={{ uri: `${BASE_URL}/images/banner-men.png` }}
+          style={styles.banner}
+        />
 
-      <View style={[styles.section, { marginBottom: 30 }]}>
-        <View style={styles.header}>
-          <Text style={styles.title}>PROM & STYLES</Text>
-          <TouchableOpacity
-            onPress={() => router.push("/pages/men/menProm" as any)}
-          >
-            <Text style={styles.viewMore}>view more</Text>
-          </TouchableOpacity>
+        <View style={styles.section}>
+          <View style={styles.header}>
+            <Text style={styles.title}>TUXEDO & SUITS</Text>
+            <TouchableOpacity
+              onPress={() => router.push("/pages/men/menTuxedo" as any)}
+            >
+              <Text style={styles.viewMore}>view more</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.row}>{tux.slice(0, 6).map(renderProduct)}</View>
         </View>
 
-        <View style={styles.row}>{prom.slice(0, 6).map(renderProduct)}</View>
-      </View>
-    </ScrollView>
+        <View style={[styles.section, { marginBottom: 30 }]}>
+          <View style={styles.header}>
+            <Text style={styles.title}>PROM & STYLES</Text>
+            <TouchableOpacity
+              onPress={() => router.push("/pages/men/menProm" as any)}
+            >
+              <Text style={styles.viewMore}>view more</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.row}>{prom.slice(0, 6).map(renderProduct)}</View>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -151,7 +162,6 @@ const styles = StyleSheet.create({
   name: { marginTop: 5, fontSize: 12, color: "#444" },
   price: { marginTop: 2, fontWeight: "bold" },
 
-  /* ✅ NEW STYLES FOR TABS */
   tabs: {
     flexDirection: "row",
     alignSelf: "center",

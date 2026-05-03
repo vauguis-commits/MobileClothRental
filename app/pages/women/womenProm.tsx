@@ -1,19 +1,21 @@
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-    ActivityIndicator,
-    Image,
-    RefreshControl,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Image,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Navbar from "../../../component/Navbar";
 import API, { BASE_URL } from "../../../services/api";
+
+import Sidebar from "../../../component/Sidebar";
 
 type Product = {
   id: number;
@@ -38,6 +40,8 @@ export default function WomenProm() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [priceFilter, setPriceFilter] = useState<PriceFilter>("");
+
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
   const loadData = async () => {
     setError("");
@@ -116,10 +120,15 @@ export default function WomenProm() {
 
   // ── Main ──
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <Navbar onMenuPress={() => console.log("Open sidebar")} />
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      {/* ✅ SIDEBAR ADDED */}
+      <Sidebar
+        visible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
+      />
+      {/* NAVBAR */}
+      <Navbar onMenuPress={() => setSidebarVisible(true)} />
       <Text style={styles.title}>PROM & STYLES</Text>
-
       {/* Search */}
       <View style={styles.searchRow}>
         <TextInput
@@ -174,7 +183,7 @@ export default function WomenProm() {
       >
         {filteredProducts.length === 0 ? (
           <View style={styles.centered}>
-            <Text style={styles.empty}>No items match your search</Text>
+            <Text style={styles.empty}>No items match your search.</Text>
             <TouchableOpacity
               onPress={() => {
                 setSearch("");
@@ -213,7 +222,7 @@ export default function WomenProm() {
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

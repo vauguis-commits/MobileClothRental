@@ -1,15 +1,16 @@
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import Navbar from "../../../component/Navbar";
+import Sidebar from "../../../component/Sidebar"; // ✅ ADD THIS
 import API, { BASE_URL } from "../../../services/api";
 
 type Product = {
@@ -22,6 +23,8 @@ type Product = {
 const WomenDashboard = () => {
   const [wedding, setWedding] = useState<Product[]>([]);
   const [prom, setProm] = useState<Product[]>([]);
+
+  const [sidebarVisible, setSidebarVisible] = useState(false); // ✅ ADD
 
   useEffect(() => {
     const loadData = async () => {
@@ -71,59 +74,68 @@ const WomenDashboard = () => {
   );
 
   return (
-    <ScrollView style={styles.container}>
-      {/* NAVBAR */}
-      <Navbar onMenuPress={() => console.log("Open sidebar")} />
-
-      {/* MEN / WOMEN TABS */}
-      <View style={styles.tabs}>
-        <TouchableOpacity
-          style={styles.tab}
-          onPress={() => router.push("/pages/men/menDashboard" as any)}
-        >
-          <Text>MEN</Text>
-        </TouchableOpacity>
-
-        {/* ✅ FIXED: removed onPress */}
-        <TouchableOpacity style={[styles.tab, styles.activeTab]}>
-          <Text>WOMENs</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* BANNER */}
-      <Image
-        source={{ uri: `${BASE_URL}/images/banner-women.png` }}
-        style={styles.banner}
+    <View style={{ flex: 1 }}>
+      {/* ✅ SIDEBAR */}
+      <Sidebar
+        visible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
       />
 
-      {/* WEDDING GOWNS */}
-      <View style={styles.section}>
-        <View style={styles.header}>
-          <Text style={styles.title}>WEDDING GOWNS</Text>
+      <ScrollView style={styles.container}>
+        {/* NAVBAR */}
+        <Navbar onMenuPress={() => setSidebarVisible(true)} />
+
+        {/* MEN / WOMEN TABS */}
+        <View style={styles.tabs}>
           <TouchableOpacity
-            onPress={() => router.push("/pages/women/womenWedding" as any)}
+            style={styles.tab}
+            onPress={() => router.push("/pages/men/menDashboard" as any)}
           >
-            <Text style={styles.viewMore}>view more</Text>
+            <Text>MEN</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.tab, styles.activeTab]}>
+            <Text>WOMEN</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.row}>{wedding.slice(0, 6).map(renderProduct)}</View>
-      </View>
+        {/* BANNER */}
+        <Image
+          source={{ uri: `${BASE_URL}/images/banner-women.png` }}
+          style={styles.banner}
+        />
 
-      {/* PROM & STYLES */}
-      <View style={[styles.section, { marginBottom: 30 }]}>
-        <View style={styles.header}>
-          <Text style={styles.title}>PROM & STYLES</Text>
-          <TouchableOpacity
-            onPress={() => router.push("/pages/women/womenProm" as any)}
-          >
-            <Text style={styles.viewMore}>view more</Text>
-          </TouchableOpacity>
+        {/* WEDDING GOWNS */}
+        <View style={styles.section}>
+          <View style={styles.header}>
+            <Text style={styles.title}>WEDDING GOWNS</Text>
+            <TouchableOpacity
+              onPress={() => router.push("/pages/women/womenWedding" as any)}
+            >
+              <Text style={styles.viewMore}>view more</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.row}>
+            {wedding.slice(0, 6).map(renderProduct)}
+          </View>
         </View>
 
-        <View style={styles.row}>{prom.slice(0, 6).map(renderProduct)}</View>
-      </View>
-    </ScrollView>
+        {/* PROM & STYLES */}
+        <View style={[styles.section, { marginBottom: 30 }]}>
+          <View style={styles.header}>
+            <Text style={styles.title}>PROM & STYLES</Text>
+            <TouchableOpacity
+              onPress={() => router.push("/pages/women/womenProm" as any)}
+            >
+              <Text style={styles.viewMore}>view more</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.row}>{prom.slice(0, 6).map(renderProduct)}</View>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 

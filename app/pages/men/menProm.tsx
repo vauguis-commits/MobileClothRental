@@ -13,7 +13,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import Navbar from "../../../component/Navbar"; // ✅ ADDED
+import Navbar from "../../../component/Navbar";
+import Sidebar from "../../../component/Sidebar"; // ✅ ADDED
 import API, { BASE_URL } from "../../../services/api";
 
 type Product = {
@@ -39,6 +40,8 @@ export default function MenProm() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [priceFilter, setPriceFilter] = useState<PriceFilter>("");
+
+  const [sidebarVisible, setSidebarVisible] = useState(false); // ✅ ADDED
 
   const loadData = async () => {
     setError("");
@@ -91,22 +94,20 @@ export default function MenProm() {
   const productImage = (image: string) =>
     image ? `${BASE_URL}/storage/${image}` : `${BASE_URL}/images/hfhmn.jpg`;
 
-  // ── Loading ──
   if (loading) {
     return (
       <SafeAreaView style={styles.centered}>
-        <Navbar onMenuPress={() => console.log("Open sidebar")} />
+        <Navbar onMenuPress={() => setSidebarVisible(true)} />
         <ActivityIndicator size="large" color="#3b2314" />
         <Text style={styles.loadingText}>Loading...</Text>
       </SafeAreaView>
     );
   }
 
-  // ── Error ──
   if (error) {
     return (
       <SafeAreaView style={styles.centered}>
-        <Navbar onMenuPress={() => console.log("Open sidebar")} />
+        <Navbar onMenuPress={() => setSidebarVisible(true)} />
         <Text style={styles.errorText}>⚠ {error}</Text>
         <TouchableOpacity style={styles.retryButton} onPress={loadData}>
           <Text style={styles.retryText}>Retry</Text>
@@ -115,13 +116,18 @@ export default function MenProm() {
     );
   }
 
-  // ── Main ──
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      {/* ✅ NAVBAR ADDED HERE */}
-      <Navbar onMenuPress={() => console.log("Open sidebar")} />
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      {/* ✅ SIDEBAR ADDED */}
+      <Sidebar
+        visible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
+      />
 
-      <Text style={styles.title}>PROM & STYLESs</Text>
+      {/* NAVBAR */}
+      <Navbar onMenuPress={() => setSidebarVisible(true)} />
+
+      <Text style={styles.title}>PROM & STYLES</Text>
 
       <View style={styles.searchRow}>
         <TextInput
@@ -200,7 +206,6 @@ export default function MenProm() {
                 <Image
                   source={{ uri: productImage(product.image) }}
                   style={styles.image}
-                  resizeMode="cover"
                 />
                 <Text style={styles.name} numberOfLines={1}>
                   {product.item_name}
@@ -213,10 +218,9 @@ export default function MenProm() {
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
-
 const styles = StyleSheet.create({
   title: {
     marginTop: 10,

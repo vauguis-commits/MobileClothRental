@@ -60,6 +60,10 @@ export default function RootLayout() {
           name="pages/product/checkout"
           options={{ headerShown: false }}
         />
+        <Stack.Screen name="pages/About" options={{ headerShown: false }} />
+        <Stack.Screen name="pages/howto" options={{ headerShown: false }} />
+        <Stack.Screen name="pages/Faq" options={{ headerShown: false }} />
+        <Stack.Screen name="pages/Profile" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

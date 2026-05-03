@@ -10,6 +10,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import Navbar from "../../../component/Navbar";
+import Sidebar from "../../../component/Sidebar"; // ✅ ADDED
 import API, { BASE_URL } from "../../../services/api";
 
 type Size = {
@@ -31,9 +34,12 @@ type Product = {
 
 export default function ProductDetails() {
   const { id } = useLocalSearchParams();
+
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [sidebarVisible, setSidebarVisible] = useState(false); // ✅ ADDED
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -51,7 +57,6 @@ export default function ProductDetails() {
     if (id) loadProduct();
   }, [id]);
 
-  // ── Parse sizes (same logic as Vue computed) ─────────────────
   const getSizes = (): Size[] => {
     if (!product?.sizes) return [];
     try {
@@ -59,6 +64,7 @@ export default function ProductDetails() {
         typeof product.sizes === "string"
           ? JSON.parse(product.sizes)
           : product.sizes;
+
       return Array.isArray(parsed)
         ? parsed.filter(
             (s) =>
@@ -89,20 +95,22 @@ export default function ProductDetails() {
   const isOutOfStock = Number(product?.quantity) <= 0;
   const sizes = getSizes();
 
-  // ── Loading ──────────────────────────────────────────────────
+  // ── Loading ──
   if (loading) {
     return (
       <SafeAreaView style={styles.centered}>
+        <Navbar onMenuPress={() => setSidebarVisible(true)} />
         <ActivityIndicator size="large" color="#3b2314" />
         <Text style={styles.loadingText}>Loading product...</Text>
       </SafeAreaView>
     );
   }
 
-  // ── Error ────────────────────────────────────────────────────
+  // ── Error ──
   if (error || !product) {
     return (
       <SafeAreaView style={styles.centered}>
+        <Navbar onMenuPress={() => setSidebarVisible(true)} />
         <Text style={styles.errorText}>⚠ {error || "Product not found."}</Text>
         <TouchableOpacity style={styles.retryBtn} onPress={() => router.back()}>
           <Text style={styles.retryText}>Go Back</Text>
@@ -111,9 +119,18 @@ export default function ProductDetails() {
     );
   }
 
-  // ── Main ─────────────────────────────────────────────────────
+  // ── Main ──
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      {/* ✅ SIDEBAR */}
+      <Sidebar
+        visible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
+      />
+
+      {/* NAVBAR */}
+      <Navbar onMenuPress={() => setSidebarVisible(true)} />
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Product Image */}
         <Image
@@ -123,7 +140,6 @@ export default function ProductDetails() {
         />
 
         <View style={styles.infoContainer}>
-          {/* Out of stock banner */}
           {isOutOfStock && (
             <View style={styles.outOfStockBanner}>
               <Text style={styles.outOfStockTitle}>Out of Stock</Text>
@@ -133,21 +149,17 @@ export default function ProductDetails() {
             </View>
           )}
 
-          {/* Name & Price */}
           <Text style={styles.productName}>{product.item_name}</Text>
           <Text style={styles.rentPrice}>
             Rent for ₱{formatPrice(product.rental_fee)}
           </Text>
 
-          {/* Divider */}
           <View style={styles.divider} />
 
-          {/* Size Table */}
           {sizes.length > 0 && (
             <View style={styles.sizeSection}>
               <Text style={styles.sizeTitle}>AVAILABLE SIZES (inches)</Text>
 
-              {/* Table Header */}
               <View style={[styles.tableRow, styles.tableHeader]}>
                 {["Size", "Chest", "Waist", "Hip", "Stock"].map((h) => (
                   <Text
@@ -159,7 +171,6 @@ export default function ProductDetails() {
                 ))}
               </View>
 
-              {/* Table Rows */}
               {sizes.map((size, index) => (
                 <View
                   key={index}
@@ -189,10 +200,8 @@ export default function ProductDetails() {
             </View>
           )}
 
-          {/* Divider */}
           <View style={styles.divider} />
 
-          {/* Rent Now Button */}
           <TouchableOpacity
             style={[styles.rentBtn, isOutOfStock && styles.rentBtnDisabled]}
             disabled={isOutOfStock}
@@ -206,7 +215,7 @@ export default function ProductDetails() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

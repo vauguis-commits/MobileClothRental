@@ -15,6 +15,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Navbar from "../../../component/Navbar";
 import API, { BASE_URL } from "../../../services/api";
 
+import Sidebar from "../../../component/Sidebar";
+
 type Product = {
   id: number;
   image: string;
@@ -38,6 +40,8 @@ export default function MenTuxedo() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [priceFilter, setPriceFilter] = useState<PriceFilter>("");
+
+  const [sidebarVisible, setSidebarVisible] = useState(false); // ✅ ADDED
 
   const loadData = async () => {
     setError("");
@@ -116,9 +120,15 @@ export default function MenTuxedo() {
 
   // ── Main ─────────────────────────────────────────────────────
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <Navbar onMenuPress={() => console.log("Open sidebar")} />
-      <Text style={styles.title}>TUXEDOs & SUITS</Text>
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      {/* ✅ SIDEBAR ADDED */}
+      <Sidebar
+        visible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
+      />
+      {/* NAVBAR */}
+      <Navbar onMenuPress={() => setSidebarVisible(true)} />
+      <Text style={styles.title}>PROM & STYLES</Text>
       {/* Search bar */}
       <View style={styles.searchRow}>
         <TextInput
@@ -212,7 +222,7 @@ export default function MenTuxedo() {
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
