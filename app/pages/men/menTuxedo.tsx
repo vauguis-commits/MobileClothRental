@@ -128,7 +128,7 @@ export default function MenTuxedo() {
       />
       {/* NAVBAR */}
       <Navbar onMenuPress={() => setSidebarVisible(true)} />
-      <Text style={styles.title}>PROM & STYLES</Text>
+      <Text style={styles.title}>TUXEDO & SUITS</Text>
       {/* Search bar */}
       <View style={styles.searchRow}>
         <TextInput

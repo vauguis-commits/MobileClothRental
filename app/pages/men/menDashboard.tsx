@@ -85,27 +85,28 @@ const MenDashboard = () => {
         {/* NAVBAR */}
         <Navbar onMenuPress={() => setSidebarVisible(true)} />
 
-        {/* MEN / WOMEN TABS */}
-        <View style={styles.tabs}>
-          <TouchableOpacity
-            style={[styles.tab, styles.activeTab]}
-            onPress={() => router.push("/pages/men/menDashboard" as any)}
-          >
-            <Text>MEN</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.tab}
-            onPress={() => router.push("/pages/women/womenDashboard" as any)}
-          >
-            <Text>WOMEN</Text>
-          </TouchableOpacity>
+        <View style={styles.bannerContainer}>
+          <Image
+            source={{ uri: `${BASE_URL}/images/banner-men.png` }}
+            style={styles.banner}
+          />
+          <View style={styles.tabsOverlay}>
+            <View style={styles.tabsPill}>
+              <TouchableOpacity
+                style={[styles.tab, styles.activeTab]}
+                onPress={() => router.push("/pages/men/menDashboard" as any)}
+              >
+                <Text style={styles.activeTabText}>MEN</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.tab}
+                onPress={() => router.push("/pages/women/womenDashboard" as any)}
+              >
+                <Text style={styles.tabText}>WOMEN</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
-
-        <Image
-          source={{ uri: `${BASE_URL}/images/banner-men.png` }}
-          style={styles.banner}
-        />
 
         <View style={styles.section}>
           <View style={styles.header}>
@@ -162,11 +163,19 @@ const styles = StyleSheet.create({
   name: { marginTop: 5, fontSize: 12, color: "#444" },
   price: { marginTop: 2, fontWeight: "bold" },
 
-  tabs: {
+  bannerContainer: {
+    position: "relative",
+  },
+  tabsOverlay: {
+    position: "absolute",
+    top: 12,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+  },
+  tabsPill: {
     flexDirection: "row",
-    alignSelf: "center",
-    marginVertical: 10,
-    backgroundColor: "#eee",
+    backgroundColor: "rgba(238,238,238,0.88)",
     borderRadius: 20,
     overflow: "hidden",
   },
@@ -177,4 +186,6 @@ const styles = StyleSheet.create({
   activeTab: {
     backgroundColor: "#d6b37a",
   },
+  tabText: { color: "#333", fontWeight: "600" },
+  activeTabText: { color: "#000", fontWeight: "700" },
 });

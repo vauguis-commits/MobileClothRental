@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -12,7 +13,7 @@ const Navbar = ({ onMenuPress }: Props) => {
       <View style={styles.topRow}>
         {/* ☰ MENU BUTTON */}
         <TouchableOpacity onPress={onMenuPress} style={styles.menuBtn}>
-          <Text style={styles.menuIcon}>☰</Text>
+          <Ionicons name="menu-outline" size={28} color="#1E1209" />
         </TouchableOpacity>
 
         {/* TITLE */}
@@ -32,7 +33,7 @@ export default Navbar;
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 40,
+    paddingTop: 60,
     paddingBottom: 10,
     backgroundColor: "#C29E72",
   },
@@ -47,10 +48,6 @@ const styles = StyleSheet.create({
     width: 40,
     justifyContent: "center",
     alignItems: "flex-start",
-  },
-
-  menuIcon: {
-    fontSize: 26,
   },
 
   title: {

@@ -63,15 +63,7 @@ export default function RootLayout() {
         <Stack.Screen name="pages/About" options={{ headerShown: false }} />
         <Stack.Screen name="pages/howto" options={{ headerShown: false }} />
         <Stack.Screen name="pages/Faq" options={{ headerShown: false }} />
-        <Stack.Screen name="pages/profile" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="pages/RentedItems"
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="pages/notification"
-          options={{ headerShown: false }}
-        />
+        <Stack.Screen name="pages/Profile" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
