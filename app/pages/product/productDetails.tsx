@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Navbar from "../../../component/Navbar";
-import Sidebar from "../../../component/Sidebar"; // ✅ ADDED
+import Sidebar from "../../../component/Sidebar";
 import API, { BASE_URL } from "../../../services/api";
 
 type Size = {
@@ -39,7 +39,7 @@ export default function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [sidebarVisible, setSidebarVisible] = useState(false); // ✅ ADDED
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -122,17 +122,14 @@ export default function ProductDetails() {
   // ── Main ──
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      {/* ✅ SIDEBAR */}
       <Sidebar
         visible={sidebarVisible}
         onClose={() => setSidebarVisible(false)}
       />
 
-      {/* NAVBAR */}
       <Navbar onMenuPress={() => setSidebarVisible(true)} />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Product Image */}
         <Image
           source={{ uri: productImage(product.image) }}
           style={styles.image}
@@ -202,11 +199,15 @@ export default function ProductDetails() {
 
           <View style={styles.divider} />
 
+          {/* ✅ FIXED BUTTON */}
           <TouchableOpacity
             style={[styles.rentBtn, isOutOfStock && styles.rentBtnDisabled]}
             disabled={isOutOfStock}
             onPress={() =>
-              router.push(`/pages/product/checkout?id=${product.id}` as any)
+              router.push({
+                pathname: "/pages/product/checkout",
+                params: { id: String(product.id) }, // 🔥 important
+              })
             }
           >
             <Text style={styles.rentBtnText}>

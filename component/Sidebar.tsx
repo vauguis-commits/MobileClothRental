@@ -36,7 +36,7 @@ const Sidebar = ({ visible, onClose }: Props) => {
         {Item("FAQ", "/pages/Faq")}
         {Item("Profile", "/pages/profile")}
         {Item("Rented Items", "/pages/RentedItems")}
-        {Item("Notifications", "/pages/Notifications")}
+        {Item("Notifications", "/pages/notification")}
       </View>
 
       {/* click outside to close */}
@@ -49,12 +49,13 @@ export default Sidebar;
 
 const styles = StyleSheet.create({
   overlay: {
-    marginTop: 82, // ✅ PUSH BELOW NAVBAR
+    marginTop: 82,
     position: "absolute",
     width: "100%",
     height: "95%",
     flexDirection: "row",
     zIndex: 100,
+    pointerEvents: "box-none",
   },
 
   sidebar: {
