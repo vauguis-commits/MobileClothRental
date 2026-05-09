@@ -3,15 +3,14 @@ import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Image,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import Navbar from "../../component/Navbar";
@@ -30,42 +29,68 @@ export default function Profile() {
   const [avatar, setAvatar] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<any>(null);
 
-  // RESET PASSWORD
   const [showReset, setShowReset] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
     current_password: "",
     password: "",
     password_confirmation: "",
   });
+
   const [passwordErrors, setPasswordErrors] = useState<any>({});
 
-  // LOAD USER
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await API.get("/user");
-        const data = res.data;
+  const [isInitialized, setIsInitialized] = useState(false);
 
-        setName(data.name || "");
-        setNumber(data.number || "");
-        setEmail(data.email || "");
-        setAddress(data.address || "");
+  const getToken = async () => {
+    return await AsyncStorage.getItem("token");
+  };
 
-        setAvatar(data.avatar ? `${BASE_URL}/storage/${data.avatar}` : null);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoading(false);
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+
+      const token = await getToken();
+      if (!token) {
+        router.replace("/auth/login");
+        return;
       }
-    };
 
-    load();
+      const res = await API.get("/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const user = res?.data?.user;
+
+      setName(user.name || "");
+      setNumber(user.number || "");
+      setEmail(user.email || "");
+      setAddress(user.address || "");
+
+      setAvatar(
+        user.profile_photo ? `${BASE_URL}/storage/${user.profile_photo}` : null,
+      );
+
+      setIsInitialized(true);
+    } catch (err: any) {
+      console.log("PROFILE ERROR:", err?.response?.data || err.message);
+
+      if (err?.response?.status === 401) {
+        await AsyncStorage.removeItem("token");
+        router.replace("/auth/login");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
   }, []);
 
-  // PICK IMAGE
   const handleUploadPhoto = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
     });
@@ -77,16 +102,17 @@ export default function Profile() {
     }
   };
 
-  // UPDATE PROFILE
   const handleUpdateProfile = async () => {
     try {
+      const token = await getToken();
+
       const formData = new FormData();
-
       formData.append("name", name);
-      formData.append("number", number);
+      formData.append("number", number || "");
       formData.append("email", email);
-      formData.append("address", address);
+      formData.append("address", address || "");
 
+      // ✅ FIXED: MUST be "avatar" (Laravel expects this)
       if (avatarFile) {
         formData.append("avatar", {
           uri: avatarFile.uri,
@@ -95,45 +121,53 @@ export default function Profile() {
         } as any);
       }
 
-      await API.post("/profile/update", formData, {
+      const res = await fetch(`${BASE_URL}/api/profile/update`, {
+        method: "POST",
         headers: {
-          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
         },
+        body: formData,
       });
 
+      const data = await res.json();
+
+      console.log("UPDATE RESPONSE:", data);
+
+      if (!res.ok) {
+        throw new Error(data?.message || "Update failed");
+      }
+
+      await fetchProfile();
       alert("Profile updated!");
-    } catch (err) {
-      console.log(err);
+    } catch (err: any) {
+      console.log("UPDATE ERROR:", err.message);
       alert("Update failed");
     }
   };
 
-  // LOGOUT
   const handleLogout = async () => {
-    await API.post("/logout");
-    await AsyncStorage.clear();
+    await AsyncStorage.removeItem("token");
     router.replace("/auth/login");
   };
 
-  // RESET PASSWORD
   const resetPassword = async () => {
     try {
-      setPasswordErrors({});
+      const token = await getToken();
 
-      const res = await API.post("/api/profile/reset-password", passwordForm);
+      const res = await API.post("/profile/reset-password", passwordForm, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      if (res.data?.errors) {
-        setPasswordErrors(res.data.errors);
+      const data = res.data;
+
+      if (data?.errors) {
+        setPasswordErrors(data.errors);
         return;
       }
 
       setShowReset(false);
-      setPasswordForm({
-        current_password: "",
-        password: "",
-        password_confirmation: "",
-      });
-
       alert("Password reset successful");
     } catch (err: any) {
       setPasswordErrors(err?.response?.data?.errors || {});
@@ -160,7 +194,6 @@ export default function Profile() {
       <ScrollView style={{ padding: 20 }}>
         <Text style={styles.title}>PROFILE</Text>
 
-        {/* AVATAR */}
         <View style={{ alignItems: "center" }}>
           <Image
             source={
@@ -179,53 +212,36 @@ export default function Profile() {
           </TouchableOpacity>
         </View>
 
-        {/* FORM */}
         <View style={styles.formContainer}>
-          {/* NAME */}
           <Text style={styles.label}>Name</Text>
-          <TextInput
-            style={styles.input}
-            value={name}
-            onChangeText={setName}
-            placeholder="Enter your name"
-          />
+          <TextInput style={styles.input} value={name} onChangeText={setName} />
 
-          {/* NUMBER */}
           <Text style={styles.label}>Number</Text>
           <TextInput
             style={styles.input}
             value={number}
             onChangeText={setNumber}
-            placeholder="Enter your number"
           />
 
-          {/* EMAIL */}
           <Text style={styles.label}>Email Address</Text>
           <TextInput
             style={styles.input}
             value={email}
             onChangeText={setEmail}
-            placeholder="Enter your email"
           />
 
-          {/* ADDRESS */}
           <Text style={styles.label}>Home Address</Text>
           <TextInput
             style={styles.input}
             value={address}
             onChangeText={setAddress}
-            placeholder="Enter your address"
           />
 
-          {/* RESET PASSWORD */}
-          <TouchableOpacity
-            onPress={() => setShowReset(true)}
-            style={styles.resetPasswordContainer}
-          >
+          <TouchableOpacity onPress={() => setShowReset(true)}>
             <Text style={styles.resetPasswordText}>Reset Password</Text>
           </TouchableOpacity>
         </View>
-        {/* UPDATE */}
+
         <TouchableOpacity
           style={styles.updateBtn}
           onPress={handleUpdateProfile}
@@ -233,69 +249,10 @@ export default function Profile() {
           <Text style={{ color: "#fff" }}>UPDATE PROFILE</Text>
         </TouchableOpacity>
 
-        {/* LOGOUT */}
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
           <Text style={{ color: "#fff" }}>LOGOUT</Text>
         </TouchableOpacity>
       </ScrollView>
-
-      {/* RESET MODAL */}
-      <Modal visible={showReset} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalBox}>
-            <Text style={styles.modalTitle}>Reset Password</Text>
-
-            <TextInput
-              placeholder="Current Password"
-              secureTextEntry
-              style={styles.input}
-              value={passwordForm.current_password}
-              onChangeText={(t) =>
-                setPasswordForm({
-                  ...passwordForm,
-                  current_password: t,
-                })
-              }
-            />
-            <Text style={styles.error}>{passwordErrors.current_password}</Text>
-
-            <TextInput
-              placeholder="New Password"
-              secureTextEntry
-              style={styles.input}
-              value={passwordForm.password}
-              onChangeText={(t) =>
-                setPasswordForm({ ...passwordForm, password: t })
-              }
-            />
-            <Text style={styles.error}>{passwordErrors.password}</Text>
-
-            <TextInput
-              placeholder="Confirm Password"
-              secureTextEntry
-              style={styles.input}
-              value={passwordForm.password_confirmation}
-              onChangeText={(t) =>
-                setPasswordForm({
-                  ...passwordForm,
-                  password_confirmation: t,
-                })
-              }
-            />
-            <Text style={styles.error}>
-              {passwordErrors.password_confirmation}
-            </Text>
-
-            <TouchableOpacity style={styles.updateBtn} onPress={resetPassword}>
-              <Text style={{ color: "#fff" }}>RESET</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => setShowReset(false)}>
-              <Text style={{ textAlign: "center", marginTop: 10 }}>CANCEL</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
@@ -306,48 +263,28 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
-    color: "#3b2314",
   },
-
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 10,
-  },
-
+  avatar: { width: 100, height: 100, borderRadius: 50 },
   uploadBtn: {
     backgroundColor: "#0091ff",
     padding: 8,
     borderRadius: 8,
-    marginBottom: 10,
+    marginVertical: 10,
   },
-
-  formContainer: {
-    marginTop: 20,
-  },
-
-  label: {
-    fontSize: 14,
-    marginBottom: 6,
-    fontWeight: "600",
-    color: "#3b2314",
-  },
+  formContainer: { marginTop: 20 },
+  label: { fontSize: 14, fontWeight: "600" },
   input: {
     backgroundColor: "#eee",
     padding: 12,
     marginBottom: 10,
     borderRadius: 8,
   },
-
   updateBtn: {
     backgroundColor: "#89d64a",
     padding: 14,
     borderRadius: 8,
     alignItems: "center",
-    marginTop: 10,
   },
-
   logoutBtn: {
     backgroundColor: "red",
     padding: 14,
@@ -355,58 +292,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
   },
-
-  resetLink: {
-    alignItems: "center",
-    marginTop: 5,
-    marginBottom: 10,
-  },
-
-  resetLinkText: {
-    color: "#0d6efd",
-    fontSize: 13,
-    textDecorationLine: "underline",
-    fontWeight: "500",
-  },
-
-  resetPasswordContainer: {
-    alignItems: "center",
-    marginTop: 10,
-    marginBottom: 10,
-  },
-
   resetPasswordText: {
     color: "#0d6efd",
-    fontSize: 13,
     textDecorationLine: "underline",
-    fontWeight: "500",
+    textAlign: "center",
+    alignSelf: "center",
+    marginTop: 10,
+    marginBottom: 20,
   },
-
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    padding: 20,
-  },
-
-  modalBox: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 12,
-  },
-
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-
-  error: {
-    color: "red",
-    fontSize: 12,
-    marginBottom: 5,
-  },
-
   centered: {
     flex: 1,
     justifyContent: "center",
