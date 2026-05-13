@@ -13,14 +13,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import Navbar from "../../component/Navbar";
 import Sidebar from "../../component/Sidebar";
 import API, { BASE_URL } from "../../services/api";
 
 type Tab = "rented" | "notif" | "settings";
-
-const SIZES = ["small", "medium", "large", "xl"];
 
 export default function Profile() {
   const [sidebarVisible, setSidebarVisible] = useState(false);
@@ -48,9 +47,12 @@ export default function Profile() {
   const [editForm, setEditForm] = useState({
     id: "",
     size: "",
+    originalSize: "",
     delivery: "delivery",
-    rent_time: "",
   });
+  const [editRentDate, setEditRentDate] = useState<Date | null>(null);
+  const [editDatePickerVisible, setEditDatePickerVisible] = useState(false);
+  const [editAvailableSizes, setEditAvailableSizes] = useState<any[]>([]);
 
   // reset password modal
   const [showResetModal, setShowResetModal] = useState(false);
@@ -198,17 +200,34 @@ export default function Profile() {
 
   // ── Rented Items ─────────────────────────────────────────────────────────────
 
-  const openEditModal = (r: any) => {
+  const openEditModal = async (r: any) => {
+    const currentSize = (r.size || "").toLowerCase();
     setEditForm({
       id: String(r.id),
-      size: (r.size || "").toLowerCase(),
+      size: currentSize,
+      originalSize: currentSize,
       delivery: r.delivery || "delivery",
-      rent_time: r.rent_time ? r.rent_time.slice(0, 16) : "",
     });
+    setEditRentDate(r.rent_time ? new Date(r.rent_time) : null);
+
+    try {
+      const token = await getToken();
+      const res = await API.get(`/checkout/${r.product_id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setEditAvailableSizes(res.data.availableSizes || []);
+    } catch {
+      setEditAvailableSizes([]);
+    }
+
     setShowEditModal(true);
   };
 
   const updateReservation = async () => {
+    if (!editRentDate) {
+      alert("Please select a rent time.");
+      return;
+    }
     try {
       const token = await getToken();
       await API.post(
@@ -216,7 +235,7 @@ export default function Profile() {
         {
           size: editForm.size,
           delivery: editForm.delivery,
-          rent_time: editForm.rent_time,
+          rent_time: editRentDate.toISOString(),
         },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -526,22 +545,33 @@ export default function Profile() {
 
             <Text style={s.modalLabel}>Select Size</Text>
             <View style={s.sizeRow}>
-              {SIZES.map((sz) => (
-                <TouchableOpacity
-                  key={sz}
-                  style={[s.sizeBtn, editForm.size === sz && s.sizeBtnActive]}
-                  onPress={() => setEditForm({ ...editForm, size: sz })}
-                >
-                  <Text
+              {editAvailableSizes.map((item: any) => {
+                const sz = (item.size || "").toLowerCase();
+                const isSelected = editForm.size === sz;
+                const isDisabled =
+                  item.available <= 0 && sz !== editForm.originalSize;
+                return (
+                  <TouchableOpacity
+                    key={sz}
+                    disabled={isDisabled}
                     style={[
-                      s.sizeBtnText,
-                      editForm.size === sz && s.sizeBtnTextActive,
+                      s.sizeBtn,
+                      isSelected && s.sizeBtnActive,
+                      isDisabled && { opacity: 0.3 },
                     ]}
+                    onPress={() => setEditForm({ ...editForm, size: sz })}
                   >
-                    {sz.toUpperCase()}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+                    <Text
+                      style={[
+                        s.sizeBtnText,
+                        isSelected && s.sizeBtnTextActive,
+                      ]}
+                    >
+                      {sz.toUpperCase()}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
 
             <Text style={s.modalLabel}>Method</Text>
@@ -571,11 +601,26 @@ export default function Profile() {
             </View>
 
             <Text style={s.modalLabel}>Rent Time</Text>
-            <TextInput
-              style={s.input}
-              value={editForm.rent_time}
-              onChangeText={(v) => setEditForm({ ...editForm, rent_time: v })}
-              placeholder="2026-05-10T10:30"
+            <TouchableOpacity
+              style={s.datePickerBtn}
+              onPress={() => setEditDatePickerVisible(true)}
+            >
+              <Text style={s.datePickerText}>
+                {editRentDate
+                  ? editRentDate.toLocaleString()
+                  : "Select Date and Time"}
+              </Text>
+            </TouchableOpacity>
+            <DateTimePickerModal
+              isVisible={editDatePickerVisible}
+              mode="datetime"
+              display="spinner"
+              date={editRentDate ?? new Date()}
+              onConfirm={(date: Date) => {
+                setEditRentDate(date);
+                setEditDatePickerVisible(false);
+              }}
+              onCancel={() => setEditDatePickerVisible(false)}
             />
 
             <TouchableOpacity
@@ -871,4 +916,12 @@ const s = StyleSheet.create({
   methodBtnText: { color: "#444", fontSize: 13 },
   methodBtnTextActive: { color: "#fff", fontWeight: "700" },
   errText: { color: "#d9534f", fontSize: 12, marginTop: -8, marginBottom: 8 },
+  datePickerBtn: {
+    backgroundColor: "#eee",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    marginBottom: 12,
+  },
+  datePickerText: { fontSize: 14, color: "#333" },
 });
