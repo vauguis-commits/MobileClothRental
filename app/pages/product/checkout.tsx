@@ -105,7 +105,7 @@ export default function Checkout() {
       Alert.alert("Success", "Order placed successfully.");
 
       // FIXED ROUTE (safe for expo-router)
-      router.replace("/pages/RentedItems" as any);
+      router.replace("/pages/Profile" as any);
     } catch (err: any) {
       Alert.alert("Error", err.response?.data?.message || "Checkout failed");
     }
